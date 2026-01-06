@@ -27,10 +27,10 @@ typedef struct Simulation {
 	int moving_window;		///< Use moving window
 
 	// MPI parallel info
-	int rank;          
-	int size;          
-	int neighbor_left;  
-	int neighbor_right; 
+	int rank;          ///< MPI rank of this process
+	int size;          ///< Total number of MPI ranks
+	int neighbor_left;  ///< MPI rank of left neighbor (MPI_PROC_NULL if none)
+	int neighbor_right; ///< MPI rank of right neighbor (MPI_PROC_NULL if none)
 
 } t_simulation;
 
