@@ -1,0 +1,11 @@
+# Build artifacts
+*.o
+zpic_v2.3/zpic_mpi
+
+# Output files
+*.out
+*.err
+*.txt
+
+# Diagnostic files
+*.zdf

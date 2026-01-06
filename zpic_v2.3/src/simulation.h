@@ -26,6 +26,12 @@ typedef struct Simulation {
 
 	int moving_window;		///< Use moving window
 
+	// MPI parallel info
+	int rank;          ///< MPI rank of this process
+	int size;          ///< Total number of MPI ranks
+	int neighbor_left;  ///< MPI rank of left neighbor (MPI_PROC_NULL if none)
+	int neighbor_right; ///< MPI rank of right neighbor (MPI_PROC_NULL if none)
+
 } t_simulation;
 
 
@@ -79,7 +85,8 @@ void sim_report_energy_ret( t_simulation* sim, double* energy );
  * @param species 		Array of particle species, may be NULL (no particles)
  * @param n_species 	Number of particle specis
  */
-void sim_new( t_simulation* sim, int nx, float box, float dt, float tmax, int ndump, t_species* species, int n_species );
+void sim_new( t_simulation* sim, int nx, float box, float dt, float tmax, int ndump, 
+              t_species* species, int n_species, int rank, int size );
 
 /**
  * @brief Prints out report on simulation timings

@@ -12,6 +12,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <mpi.h>
 #include "simulation.h"
 #include "timer.h"
 
@@ -48,11 +49,26 @@ void sim_iter( t_simulation* sim ) {
 	for (int i = 0; i<sim -> n_species; i++)
 		spec_advance(&sim -> species[i], &sim -> emf, &sim -> current );
 
+	// Phase 2: Simply remove particles leaving domain (no migration)
+	for (int i = 0; i < sim->n_species; i++) {
+		t_species* spec = &sim->species[i];
+		int new_np = 0;
+		for (int j = 0; j < spec->np; j++) {
+			// Keep only particles with valid cell index
+			if (spec->part[j].ix >= 0 && spec->part[j].ix < spec->nx) {
+				spec->part[new_np++] = spec->part[j];
+			}
+		}
+		spec->np = new_np;
+	}
+
 	// Update current boundary conditions and advance iteration
 	current_update( &sim -> current );
 
 	// Advance EM fields
 	emf_advance( &sim -> emf, &sim -> current );
+	
+	// NO field exchange - Phase 2 has no communication
 }
 
 /**
@@ -88,12 +104,23 @@ void sim_timings( t_simulation* sim, uint64_t t0, uint64_t t1 ){
  * 						set to 0 to disable diagnostic reports
  * @param species 		Array of particle species, may be NULL (no particles)
  * @param n_species 	Number of particle specis
+ * @param rank 			MPI rank
+ * @param size 			Total number of MPI ranks
  */
-void sim_new( t_simulation* sim, int nx, float box, float dt, float tmax, int ndump, t_species* species, int n_species ){
+void sim_new( t_simulation* sim, int nx, float box, float dt, float tmax, int ndump, 
+              t_species* species, int n_species, int rank, int size ){
 
 	sim -> dt = dt;
 	sim -> tmax = tmax;
 	sim -> ndump = ndump;
+
+	// Store MPI info
+	sim -> rank = rank;
+	sim -> size = size;
+	
+	// Set neighbor topology (1D linear)
+	sim -> neighbor_left = (rank > 0) ? rank - 1 : MPI_PROC_NULL;
+	sim -> neighbor_right = (rank < size - 1) ? rank + 1 : MPI_PROC_NULL;
 
 	emf_new( &sim -> emf, nx, box, dt );
 	current_new(&sim -> current, nx, box, dt);
