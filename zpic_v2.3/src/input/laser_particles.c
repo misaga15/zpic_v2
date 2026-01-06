@@ -38,27 +38,11 @@ void sim_init( t_simulation* sim, int rank, int size ){
 	// Use 10 particles per cell
 	int ppc = 10;
 
-	// Density profile - adjust start position for local domain
-	// Global start is at 54. 0, need to check if this rank contains that region
-	float global_start = 54.0;
-	float local_box_start = rank * box_local;
-	float local_box_end = (rank + 1) * box_local;
-	
-	t_density density;
-	
-	// Check if density step falls within this rank's domain
-	if (global_start >= local_box_start && global_start < local_box_end) {
-		// This rank contains the density step
-		density. type = STEP;
-		density.start = global_start - local_box_start;  // Convert to local coordinates
-	} else if (global_start < local_box_start) {
-		// Density step is before this rank - all plasma
-		density.type = UNIFORM;
-		density.n = 1.0;
-	} else {
-		// Density step is after this rank - all vacuum
-		density.type = EMPTY;
-	}
+	// For Phase 2, use UNIFORM density across all ranks for simplicity
+	t_density density = {
+		.type = UNIFORM,
+		.n = 1.0
+	};
 
 	t_species* species = (t_species *) malloc( n_species * sizeof( t_species ));
 	spec_new( &species[0], "electrons", -1.0, ppc, NULL, NULL, nx_local, box_local, dt, &density );
@@ -69,6 +53,8 @@ void sim_init( t_simulation* sim, int rank, int size ){
 	// Add laser pulse (this must come after sim_new)
 	// Laser starts at global position 17.0
 	float global_laser_start = 17.0;
+	float local_box_start = rank * box_local;
+	float local_box_end = (rank + 1) * box_local;
 	
 	// Only add laser if it starts in this rank's domain
 	if (global_laser_start >= local_box_start && global_laser_start < local_box_end) {
@@ -81,9 +67,7 @@ void sim_init( t_simulation* sim, int rank, int size ){
 		};
 		sim_add_laser( sim, &laser );
 		
-		if (rank == 0) {
-			printf("Laser initialized in rank %d\n", rank);
-		}
+		printf("Laser added to rank %d at local position %.2f (global %.2f)\n", rank, laser.start, global_laser_start);
 	}
 
 	// Set moving window (this must come after sim_new)
