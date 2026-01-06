@@ -1,0 +1,30 @@
+rm -f zpic_mpi src/current.o src/emf.o src/particles.o src/random.o src/timer.o src/main.o src/simulation.o src/zdf.o
+mpicc -c -Ofast -g -std=c99 -pedantic -Wall -ffast-math src/current.c -o src/current.o
+mpicc -c -Ofast -g -std=c99 -pedantic -Wall -ffast-math src/emf.c -o src/emf.o
+mpicc -c -Ofast -g -std=c99 -pedantic -Wall -ffast-math src/particles.c -o src/particles.o
+mpicc -c -Ofast -g -std=c99 -pedantic -Wall -ffast-math src/random.c -o src/random.o
+mpicc -c -Ofast -g -std=c99 -pedantic -Wall -ffast-math src/timer.c -o src/timer.o
+mpicc -c -Ofast -g -std=c99 -pedantic -Wall -ffast-math src/main.c -o src/main.o
+mpicc -c -Ofast -g -std=c99 -pedantic -Wall -ffast-math src/simulation.c -o src/simulation.o
+mpicc -c -Ofast -g -std=c99 -pedantic -Wall -ffast-math src/zdf.c -o src/zdf.o
+mpicc -Ofast -g -std=c99 -pedantic -Wall -ffast-math src/current.o src/emf.o src/particles.o src/random.o src/timer.o src/main.o src/simulation.o src/zdf.o -lm -o zpic_mpi
+Running on 4 nodes with 8 total MPI ranks
+===========================================
+  ZPIC - MPI Parallel Version
+  MPI ranks: 8
+===========================================
+
+Domain Decomposition:
+  Global domain: 20000 cells, 20.00 box size
+  Local domain per rank: 2500 cells, 2.50 box size
+
+Starting simulation .. .
+
+n = 0, t = 0.0
+Energy (fields | particles | total) = 0.000000e+00 0.000000e+00 0.000000e+00
+n = 42106, t = 40.000702
+Energy (fields | particles | total) = 0.000000e+00 0.000000e+00 0.000000e+00
+Initial energy: 0.000000e+00, Final energy: 0.000000e+00
+
+Final energy different from Initial Energy.  Change in total energy is: nan % 
+Job finished at Tue  6 Jan 16:07:52 WET 2026
