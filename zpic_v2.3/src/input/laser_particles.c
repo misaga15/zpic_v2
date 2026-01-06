@@ -64,7 +64,7 @@ void sim_init( t_simulation* sim, int rank, int size ){
 	spec_new( &species[0], "electrons", -1.0, ppc, NULL, NULL, nx_local, box_local, dt, &density );
 
 	// Initialize Simulation data with LOCAL domain
-	sim_new( sim, nx_local, box_local, dt, tmax, ndump, species, n_species );
+	sim_new( sim, nx_local, box_local, dt, tmax, ndump, species, n_species, rank, size );
 
 	// Add laser pulse (this must come after sim_new)
 	// Laser starts at global position 17.0
